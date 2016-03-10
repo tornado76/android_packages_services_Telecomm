@@ -48,6 +48,7 @@ import com.android.internal.telephony.SmsApplication;
 import com.android.server.telecom.ContactsAsyncHelper.OnImageLoadCompleteListener;
 import com.android.internal.util.Preconditions;
 
+import java.lang.String;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -669,11 +670,8 @@ public class Call implements CreateConnectionResponse {
         return mCallerInfo == null ? null : mCallerInfo.name;
     }
 
-    public String getNumber() {
-        if (mCallerInfo != null) {
-            return mCallerInfo.phoneNumber;
-        }
-        return mHandle == null ? null : mHandle.getSchemeSpecificPart();
+    public String getPhoneNumber() {
+        return mCallerInfo == null ? null : mCallerInfo.phoneNumber;
     }
 
     public Bitmap getPhotoIcon() {
@@ -995,6 +993,19 @@ public class Call implements CreateConnectionResponse {
         }
     }
 
+    /**
+     * Silences the ringer.
+     */
+    void silence() {
+        if (mConnectionService == null) {
+            Log.w(this, "silence() request on a call without a connection service.");
+        } else {
+            Log.i(this, "Send silence to connection service for call %s", this);
+            Log.event(this, Log.Events.SILENCE);
+            mConnectionService.silence(this);
+        }
+    }
+
     void disconnect() {
         disconnect(false);
     }
@@ -1093,7 +1104,7 @@ public class Call implements CreateConnectionResponse {
             // Ensure video state history tracks video state at time of rejection.
             mVideoStateHistory |= mVideoState;
 
-            mConnectionService.reject(this);
+            mConnectionService.reject(this, rejectWithMessage, textMessage);
             Log.event(this, Log.Events.REQUEST_REJECT);
         }
     }

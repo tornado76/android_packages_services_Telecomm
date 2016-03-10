@@ -723,17 +723,32 @@ public class CallsManager extends Call.ListenerBase implements VideoProviderProx
         } else {
             Log.i(this, "%s Starting with speakerphone because car is docked.", call);
         }
-        call.setStartWithSpeakerphoneOn(speakerphoneOn || mDockManager.isDocked());
+
+        final boolean useSpeakerWhenDocked = mContext.getResources().getBoolean(
+                R.bool.use_speaker_when_docked);
+
+        call.setStartWithSpeakerphoneOn(speakerphoneOn
+                || (useSpeakerWhenDocked && mDockManager.isDocked()));
 
         if (call.isEmergencyCall()) {
             // Emergency -- CreateConnectionProcessor will choose accounts automatically
             call.setTargetPhoneAccount(null);
         }
 
+        final boolean requireCallCapableAccountByHandle = mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_requireCallCapableAccountForHandle);
+
         if (call.getTargetPhoneAccount() != null || call.isEmergencyCall()) {
             // If the account has been set, proceed to place the outgoing call.
             // Otherwise the connection will be initiated when the account is set by the user.
             call.startCreateConnection(mPhoneAccountRegistrar);
+        } else if (mPhoneAccountRegistrar.getCallCapablePhoneAccounts(
+                requireCallCapableAccountByHandle ? call.getHandle().getScheme() : null, false)
+                .isEmpty()) {
+            // If there are no call capable accounts, disconnect the call.
+            markCallAsDisconnected(call, new DisconnectCause(DisconnectCause.CANCELED,
+                    "No registered PhoneAccounts"));
+            markCallAsRemoved(call);
         }
     }
 
@@ -1690,7 +1705,7 @@ public class CallsManager extends Call.ListenerBase implements VideoProviderProx
     }
 
     protected boolean isCallBlacklisted(Call c) {
-        final String number = c.getNumber();
+        final String number = c.getPhoneNumber();
         // See if the number is in the blacklist
         // Result is one of: MATCH_NONE, MATCH_LIST or MATCH_REGEX
         int listType = BlacklistUtils.isListed(mContext, number, BlacklistUtils.BLOCK_CALLS);
