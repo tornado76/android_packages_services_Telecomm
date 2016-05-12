@@ -42,7 +42,7 @@
     <string name="outgoing_call_error_no_phone_number_supplied" msgid="1940125199802007505">"Pentru a apela, introduceți un număr valid."</string>
     <string name="duplicate_video_call_not_allowed" msgid="3749211605014548386">"Apelul nu poate fi adăugat în acest moment."</string>
     <string name="video_call_not_allowed_if_tty_enabled" msgid="7593649283571253283">"Dezactivați modul TTY pentru a iniția apeluri video."</string>
-    <string name="no_vm_number" msgid="4164780423805688336">"Lipseşte numărul mesageriei vocale"</string>
+    <string name="no_vm_number" msgid="4164780423805688336">"Lipsește numărul mesageriei vocale"</string>
     <string name="no_vm_number_msg" msgid="1300729501030053828">"Niciun număr de mesagerie vocală nu este stocat pe cardul SIM."</string>
     <string name="add_vm_number_str" msgid="4676479471644687453">"Adăugați numărul"</string>
     <string name="change_default_dialer_dialog_title" msgid="4430590714918044425">"Schimbați aplicația Telefon prestabilită?"</string>
